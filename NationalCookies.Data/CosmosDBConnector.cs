@@ -1,8 +1,9 @@
-﻿using Microsoft.Azure.Documents;
-using Microsoft.Azure.Documents.Client;
+﻿using Microsoft.Azure.Documents.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.Azure.Documents;
 
 namespace NationalCookies.Data
 {
@@ -20,7 +21,7 @@ namespace NationalCookies.Data
         private static readonly string _cookiePartitionKey = "/Name";
         private static readonly string _orderPartitionKey = "/Status";
 
-        private readonly DocumentClient _client;
+        private DocumentClient _client;
 
 
         public CosmosDBConnector(string endpointUri,
@@ -37,24 +38,19 @@ namespace NationalCookies.Data
 
             this._client = new DocumentClient(new Uri(this._endpointUri), this._accessKey);
 
-            ResourceResponse<Database> database = 
-                this._client.CreateDatabaseIfNotExistsAsync(new Database { Id = this._databaseName }).Result;
+            var database = this._client.CreateDatabaseIfNotExistsAsync(new Database { Id = this._databaseName }).Result;
 
 
-            DocumentCollection orderCollection = new DocumentCollection
-            {
-                Id = this._orderCollectionName
-            };
+            DocumentCollection orderCollection = new DocumentCollection();
+            orderCollection.Id = this._orderCollectionName;
             orderCollection.PartitionKey.Paths.Add(_cookiePartitionKey);
 
             this._client.CreateDocumentCollectionAsync(
                 UriFactory.CreateDatabaseUri(this._databaseName), orderCollection);
 
 
-            DocumentCollection cookieCollection = new DocumentCollection
-            {
-                Id = this._cookieCollectionName
-            };
+            DocumentCollection cookieCollection = new DocumentCollection();
+            cookieCollection.Id = this._cookieCollectionName;
             cookieCollection.PartitionKey.Paths.Add(_orderPartitionKey);
 
             this._client.CreateDocumentCollectionAsync(
@@ -105,7 +101,7 @@ namespace NationalCookies.Data
             FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1, EnableCrossPartitionQuery = true };
 
             //retrieve the cookie by Id
-            Cookie cookie = this._client.CreateDocumentQuery<Cookie>(
+            var cookie = this._client.CreateDocumentQuery<Cookie>(
                 UriFactory.CreateDocumentCollectionUri(
                     this._databaseName,
                     this._cookieCollectionName), queryOptions)
@@ -169,7 +165,7 @@ namespace NationalCookies.Data
                     this._orderCollectionName), queryOptions)
                     .Where(o => o.Status == "New");
 
-            Order currentOrder = orderQuery.AsEnumerable().FirstOrDefault();
+            var currentOrder = orderQuery.AsEnumerable().FirstOrDefault();
 
             if (currentOrder != null)
             {
@@ -177,7 +173,7 @@ namespace NationalCookies.Data
                 //and check if the cookie that we want to add is
                 //already in there
                 var orderLineExists = false;
-                foreach (OrderLine lines in currentOrder.OrderLines)
+                foreach (var lines in currentOrder.OrderLines)
                 {
                     if (lines.Cookie.Id == cookieId)
                     {
@@ -192,7 +188,7 @@ namespace NationalCookies.Data
                 if (!orderLineExists)
                 {
                     //get the cookie
-                    Cookie cookie = RetrieveCookieById(cookieId);
+                    var cookie = RetrieveCookieById(cookieId);
 
                     //add it to a new orderline
                     currentOrder.OrderLines.Add(new OrderLine
@@ -215,14 +211,12 @@ namespace NationalCookies.Data
             {
                 //if there is no order with status new
                 //create one
-                currentOrder = new Order
-                {
-                    Id = Guid.NewGuid(),
-                    Date = DateTimeOffset.Now,
-                    Status = "New"
-                };
+                currentOrder = new Order();
+                currentOrder.Id = Guid.NewGuid();
+                currentOrder.Date = DateTimeOffset.Now;
+                currentOrder.Status = "New";
 
-                Cookie cookie = RetrieveCookieById(cookieId);
+                var cookie = RetrieveCookieById(cookieId);
 
                 currentOrder.OrderLines.Add(new OrderLine
                 {
@@ -266,9 +260,9 @@ namespace NationalCookies.Data
         public Order RetrieveOrderById(Guid orderId)
         {
             FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1, EnableCrossPartitionQuery = true };
-
+            
             //retrieve the order by Id
-            Order order = this._client.CreateDocumentQuery<Order>(
+            var order = this._client.CreateDocumentQuery<Order>(
                 UriFactory.CreateDocumentCollectionUri(
                     this._databaseName,
                     this._orderCollectionName), queryOptions)
@@ -284,16 +278,16 @@ namespace NationalCookies.Data
         /// </summary>
         public void CancelOrder(Guid orderId)
         {
-            Order order = RetrieveOrderById(orderId);
+            var order = RetrieveOrderById(orderId);
 
             if (order != null)
             {
-                this._client.DeleteDocumentAsync(
-                     UriFactory.CreateDocumentUri(
-                         this._databaseName,
-                         this._orderCollectionName,
-                         order.Id.ToString()),
-                     new RequestOptions() { PartitionKey = new PartitionKey(Undefined.Value) });
+               this._client.DeleteDocumentAsync(
+                    UriFactory.CreateDocumentUri(
+                        this._databaseName,
+                        this._orderCollectionName,
+                        order.Id.ToString()),
+                    new RequestOptions() { PartitionKey = new PartitionKey(Undefined.Value) });
             }
         }
 
@@ -302,7 +296,7 @@ namespace NationalCookies.Data
         /// </summary>
         public void PlaceOrder(Guid orderId)
         {
-            Order order = RetrieveOrderById(orderId);
+            var order = RetrieveOrderById(orderId);
 
             if (order != null)
             {

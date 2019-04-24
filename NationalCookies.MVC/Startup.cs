@@ -38,8 +38,7 @@ namespace NationalCookies
                 var cookieCollection = Configuration["CosmosDBCookieCollectionName"];
                 var orderCollection = Configuration["CosmosDBOrderCollectionName"];
 
-                return new CosmosDBConnector(
-                    endpointUri, accessKey, databaseName, cookieCollection, orderCollection);
+                return new CosmosDBConnector(endpointUri, accessKey, databaseName, cookieCollection, orderCollection);
             });
 
             services.AddTransient<IOrderService, OrderService>();
