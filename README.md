@@ -5,7 +5,7 @@
 Hi! 
 
 Welcome to the GitHub repository of the nationalcookies application.
-This app is the demo app for the Pluralsight course [Microsoft Azure Developer: Implementing Azure Cache](https://app.pluralsight.com/library/courses/microsoft-azure-cache-implementing/).
+This app is the demo app for the Pluralsight course [Building Cloud-Native Solutions for Azure with Visual Studio](https://app.pluralsight.com/library/courses/microsoft-azure-cache-implementing/).
 
 You can download a copy of the code and follow along in the course.
 
@@ -15,52 +15,27 @@ The solution consists of:
 
  - NationalCookies.MVC
 	 - This is the website for the Nationalcookies cookie store
-	 - Technology: ASP.NET Core MVC 2.1	 
- - NationalCookies.Forms
-	 - This is the website for the Nationalcookies cookie store ,based on ASP.NET Forms
-	 - Technology: ASP.NET Forms 4.7	 	 
- - NationalCookies.Database
-	 - This contains the database schema and seed script
-	 - Technology: Visual Studio Database project
+	 - Technology: ASP.NET Core MVC 2.1
  - NationalCookies.Data
-	 - This is a class library that contains classes to connect to the database and work with cookies and orders
+	 - This is a class library that contains classes to connect to the Cosmos DB database and work with cookies and orders
 	 - Technology: 
 	 	- Class library (.NET Standard 2.0)
-		- Entity Framework Core 2.1
-		
-This is a very simple solution that consists out of a website (either NationalCookies.MVC or NationalCookies.Forms) that connects to a database and later on in the course, also connects to Azure Redis Cache:
+
+There are three branches in this repo:
+ - main
+ 	- The branch that contains the MVC and Data projects. This branch is used in the module **Building Azure Cosmos DB Apps with Visual Studio**
+ - withazurefunction
+ 	- This branch contains an additional project with an Azure Function in it. This branch is used in the module **Creating Azure Functions in Visual Studio**
+ - withcontainers
+ 	- This branch contains changes to support running the application in containers. It also contains an additional Web API project. This branch is used in the module **Creating Container-based Apps in Visual Studio**
+	
+
+### How to get this code working 
+The website needs a database to get information about cookies and read and write order information. The database that we are using is an Azure Cosmos DB. This can be one that you run with the local emulator (https://aka.ms/cosmosdb-emulator) or an Azure Cosmos DB that you run in Azure. 
+
+Once you have a Cosmos DB running, fill in the Cosmos DB connection details in the appsettings.json file of the NationalCookies.MVC project.
 
 
-![Image of Nationalcookies solution](https://dnz.blob.core.windows.net/cdn/Nationalcookies%20solution.png)
-
-
-Follow the steps below to get this code working:
-
-### Step 1: Create a database
-The website needs a database to get information about cookies and read and write order information. The database that we are using is a SQL Server database. This can be one that you install locally or an Azure SQL database that you run in Azure. 
-
-In any case, make sure that you have a SQL Server running that you can access.
-
-### Step 2: Change the connection strings
-In order for the website to connect to the database, we need to enter the connection string to the database.
-We do that in these two places:
-
--  NationalCookies.MVC / appsettings.json
-	- Fill in the CookieDBConnection setting with the value of the connectionstring to your SQL Server
--  NationalCookies.Forms / Web.config
-	- Fill in the CookieDBConnection setting with the value of the connectionstring to your SQL Server	
-
-### Step 3: Deploy the database schema and seed script
-Now that we have a database and that we website can connect to it, we need to make sure that there are tables and data in the database.
-
-You can do that with the NationalCookies.Database project:
-1. In Visual Studio, you can right-click on the NationalCookies.Database project and click Publish. The screen in the image below opens:
-
-![Image of Nationalcookies solution](https://dnz.blob.core.windows.net/cdn/Publish%20database%20screen.png)
-
-2. Click the Edit button to set the connection to your SQL Server database
-3. Click Publish
-
-That's it! Now, you can run either the NationalCookies.MVC or NationalCookies.Forms project and follow along with the course. 
+That's it! Now, you can run the NationalCookies.MVC project and follow along with the course. 
 
 Thanks for watching and let me know if you have any questions!
