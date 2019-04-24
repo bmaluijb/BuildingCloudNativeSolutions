@@ -1,0 +1,15 @@
+version: '3.4'
+
+services:
+  nationalcookies.mvc:
+    image: ${DOCKER_REGISTRY-}nationalcookiesmvc
+    build:
+      context: .
+      dockerfile: NationalCookies.MVC/Dockerfile
+
+  nationalcookies.api:
+    image: ${DOCKER_REGISTRY-}nationalcookiesapi
+    build:
+      context: .
+      dockerfile: NationalCookies.Api/Dockerfile
+
