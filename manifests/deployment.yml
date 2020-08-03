@@ -1,0 +1,16 @@
+apiVersion : apps/v1beta1
+kind: Deployment
+metadata:
+  name: "tipsandtricks-3280"
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: "tipsandtricks-3280"
+    spec:
+      containers:
+        - name: "tipsandtricks-3280"
+          image: "mytipsacr.azurecr.io/tipsandtricks"
+          ports:
+          - containerPort: 80
